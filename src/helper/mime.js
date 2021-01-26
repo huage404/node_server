@@ -11,6 +11,7 @@ const mimeType = {
     'xml': 'text/xml',
     'txt': 'text/plain',
     'md': 'text/plain',
+    'mp4': 'video/mpeg4',
     '*': 'application/octet-stream'
 }
 

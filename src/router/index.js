@@ -12,6 +12,7 @@ const readdir = promisify(fs.readdir);
 const mime = require('../helper/mime');
 const compress = require('../helper/compress');
 const conf = require('../config/defaultConfig');
+const range = require('../helper/range')
 
 // 使用模板文件
 const tplPath = path.join(__dirname, '../template/dir.tpl');
@@ -24,10 +25,24 @@ module.exports = async function router(req, res, filePath) {
         const stats = await stat(filePath);
         // 判断是否是文件
         if (stats.isFile()) {
+
             const contentType = mime(filePath)
-            res.statusCode = 200;
             res.setHeader('Content-Type', contentType);
-            let rs = fs.createReadStream(filePath);
+            let rs;
+
+            console.log(req.headers)
+
+            const {code , start , end} = range(stats.size, req , res);
+
+            console.log(code , start , end)
+
+            if(code === 200){
+                res.statusCode = 200;
+                rs = fs.createReadStream(filePath);
+            }else{
+                res.statusCode = 216;
+                rs = fs.createReadStream(filePath, { start , end });
+            }
             if (filePath.match(conf.compress)) {
                 rs = compress(rs, req, res)
             }
